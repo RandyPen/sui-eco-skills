@@ -1,0 +1,54 @@
+{
+  "name": "cetus-aggregator",
+  "version": "1.0.0",
+  "description": "A Claude Code skill for working with the Cetus Aggregator SDK to execute optimized swaps across multiple Sui DEXs",
+  "author": "Claude Code",
+  "license": "MIT",
+  "keywords": [
+    "cetus",
+    "aggregator",
+    "sui",
+    "defi",
+    "dex",
+    "swaps",
+    "trading"
+  ],
+  "capabilities": [
+    "sdk-initialization",
+    "multi-dex-routing",
+    "token-swaps",
+    "price-discovery",
+    "gas-optimization",
+    "error-handling"
+  ],
+  "dependencies": {
+    "@cetusprotocol/aggregator-sdk": "^1.0.0"
+  },
+  "examples": [
+    {
+      "description": "Initialize SDK with environment variables",
+      "code": "const mnemonics = process.env.MNEMONICS!; const keypair = Ed25519Keypair.deriveKeypair(mnemonics, 'm/44\\'/784\\'/0\\'/0\\'/0\\''); const client = new AggregatorClient({ signer: keypair.toSuiAddress(), client: suiClient, env: Env.Mainnet });"
+    },
+    {
+      "description": "Execute query swap with profit condition",
+      "code": "const result = await querySwap(client, keypair, '0x2::sui::SUI', '0x06864a6f921804860930db6ddbe2e16acdf8504495ea7481637a1c8b9a8fe54b::cetus::CETUS', '1000000000', '500000000');"
+    },
+    {
+      "description": "Find optimal routes across multiple DEXs",
+      "code": "const routers = await client.findRouters({ from: '0x2::sui::SUI', target: '0x06864a6f921804860930db6ddbe2e16acdf8504495ea7481637a1c8b9a8fe54b::cetus::CETUS', amount: new BN(1000000000), byAmountIn: true, providers: ['CETUS', 'KRIYA', 'AFTERMATH'] });"
+    },
+    {
+      "description": "Execute fast router swap with automatic coin management",
+      "code": "const txb = new Transaction(); await client.fastRouterSwap({ router: routers, txb, slippage: 0.01, refreshAllCoins: true }); const result = await client.signAndExecuteTransaction(txb, keypair);"
+    },
+    {
+      "description": "Execute simple swap without conditions",
+      "code": "const result = await simpleSwap(client, keypair, '0x2::sui::SUI', '0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC', '500000000', 0.02);"
+    },
+  ],
+  "tags": {
+    "blockchain": "sui",
+    "category": "defi",
+    "complexity": "intermediate"
+  }
+}

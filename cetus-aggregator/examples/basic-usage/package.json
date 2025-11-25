@@ -1,0 +1,21 @@
+{
+  "name": "cetus-aggregator-basic-usage",
+  "version": "1.0.0",
+  "description": "Basic usage example for Cetus Aggregator SDK",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/main.ts",
+    "build": "bun build src/main.ts --outdir dist",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@cetusprotocol/aggregator-sdk": "^1.0.0",
+    "@mysten/sui": "^1.0.0",
+    "bn.js": "^5.2.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/node": "^20.0.0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "claude-code-skill-cetus-aggregator",
+  "version": "1.0.0",
+  "description": "Claude Code skill for Cetus Aggregator SDK",
+  "main": "skill.md",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "claude-code",
+    "skill",
+    "cetus",
+    "aggregator",
+    "sui",
+    "defi",
+    "dex",
+    "swaps"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "dependencies": {
+    "@cetusprotocol/aggregator-sdk": "^1.0.0",
+    "@mysten/sui": "^1.0.0",
+    "bn.js": "^5.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
