@@ -32,7 +32,7 @@ export const querySwap = async (client: AggregatorClient, keypair: Ed25519Keypai
             target,
             amount: amountIn,
             byAmountIn: true,
-            providers: ["CETUS","SCALLOP","AFTERMATH","FLOWXV3","AFSUI","STEAMM","VOLO","KRIYAV3","KRIYA","ALPHAFI","FLOWX","BLUEMOVE","DEEPBOOKV3","BLUEFIN","HAEDAL","TURBOS","SPRINGSUI","STEAMM","METASTABLE","HAWAL","OBRIC"]
+            providers: ["CETUS","SCALLOP","AFTERMATH","FLOWXV3","AFSUI","STEAMM","VOLO","KRIYAV3","KRIYA","ALPHAFI","FLOWX","BLUEMOVE","DEEPBOOKV3","BLUEFIN","HAEDAL","TURBOS","SPRINGSUI","STEAMM","HAWAL","OBRIC"]
         });
 
         if (router === null) {
@@ -123,7 +123,7 @@ export async function simpleSwap(
             refreshAllCoins: true,
         });
 
-        const result = await client.signAndExecuteTransaction(txb, keypair);
+        const result = await client.client.signAndExecuteTransaction({ transaction: txb, signer: keypair });
         console.log("Swap executed successfully:", result);
         return result;
 

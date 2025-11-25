@@ -35,11 +35,11 @@
     },
     {
       "description": "Find optimal routes across multiple DEXs",
-      "code": "const routers = await client.findRouters({ from: '0x2::sui::SUI', target: '0x06864a6f921804860930db6ddbe2e16acdf8504495ea7481637a1c8b9a8fe54b::cetus::CETUS', amount: new BN(1000000000), byAmountIn: true, providers: ['CETUS', 'KRIYA', 'AFTERMATH'] });"
+      "code": "const routers = await client.findRouters({ from: '0x2::sui::SUI', target: '0x06864a6f921804860930db6ddbe2e16acdf8504495ea7481637a1c8b9a8fe54b::cetus::CETUS', amount: new BN(1000000000), byAmountIn: true, providers: ['CETUS','SCALLOP','AFTERMATH','FLOWXV3','AFSUI','STEAMM','VOLO','KRIYAV3','KRIYA','ALPHAFI','FLOWX','BLUEMOVE','DEEPBOOKV3','BLUEFIN','HAEDAL','TURBOS','SPRINGSUI','HAWAL','OBRIC','FERRA','MAGMA']}) });"
     },
     {
       "description": "Execute fast router swap with automatic coin management",
-      "code": "const txb = new Transaction(); await client.fastRouterSwap({ router: routers, txb, slippage: 0.01, refreshAllCoins: true }); const result = await client.signAndExecuteTransaction(txb, keypair);"
+      "code": "const txb = new Transaction(); await client.fastRouterSwap({ router: routers, txb, slippage: 0.01, refreshAllCoins: true }); const result = await client.client.signAndExecuteTransaction({transaction: txb, signer: keypair});"
     },
     {
       "description": "Execute simple swap without conditions",
