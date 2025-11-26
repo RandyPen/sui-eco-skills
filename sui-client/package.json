@@ -1,0 +1,48 @@
+{
+  "name": "@claude-code/sui-client-skill",
+  "version": "1.0.0",
+  "description": "Comprehensive SuiClient skill for interacting with the Sui blockchain",
+  "main": "src/index.ts",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [
+    "sui",
+    "blockchain",
+    "web3",
+    "claude-code",
+    "skill",
+    "typescript"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "dependencies": {
+    "@mysten/sui": "^1.45.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "prettier": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/claude-code/sui-client-skill"
+  },
+  "files": [
+    "src",
+    "types",
+    "examples",
+    "templates",
+    "README.md",
+    "skill.json"
+  ]
+}

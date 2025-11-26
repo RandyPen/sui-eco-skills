@@ -1,0 +1,26 @@
+{
+  "name": "sui-client",
+  "version": "1.0.0",
+  "description": "Comprehensive SuiClient skill for interacting with the Sui blockchain using @mysten/sui SDK",
+  "author": "Claude Code",
+  "license": "MIT",
+  "keywords": ["sui", "blockchain", "web3", "client", "typescript"],
+  "dependencies": {
+    "@mysten/sui": "^1.0.0"
+  },
+  "files": [
+    "skill.json",
+    "README.md",
+    "examples/",
+    "src/",
+    "types/",
+    "templates/"
+  ],
+  "categories": ["blockchain", "web3", "development"],
+  "claudeCode": {
+    "skillType": "development",
+    "supportedLanguages": ["typescript", "javascript"],
+    "entryPoint": "src/index.ts",
+    "examples": ["examples/basic-usage.ts", "examples/transactions.ts"]
+  }
+}
