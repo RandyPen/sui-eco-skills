@@ -19,8 +19,8 @@
   "author": "Claude Code",
   "license": "MIT",
   "dependencies": {
-    "@cetusprotocol/aggregator-sdk": "^1.0.0",
-    "@mysten/sui": "^1.0.0",
+    "@cetusprotocol/aggregator-sdk": "^1.4.2",
+    "@mysten/sui": "^1.45.0",
     "bn.js": "^5.2.0"
   },
   "devDependencies": {
