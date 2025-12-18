@@ -17,8 +17,27 @@ const TOKENS = {
     AFSUI: "0xf325ce1300e8dac124071d3152c5c5ee6174914f8bc2161e88329cf579246efc::afsui::AFSUI",
 }
 
-// Query Swap Function
-export const querySwap = async (client: AggregatorClient, keypair: Ed25519Keypair, from: string, target: string, amount: string, amountOut: string) => {
+/**
+ * Execute a swap with conditional checking for minimum output amount.
+ * This function finds optimal routing, validates the output meets minimum requirements,
+ * executes the swap, and transfers the resulting tokens to the sender's wallet.
+ *
+ * @param client - Aggregator client instance for interacting with the Cetus aggregator
+ * @param keypair - Ed25519 keypair for signing transactions
+ * @param from - Token address to swap from (e.g., SUI token address)
+ * @param target - Token address to swap to (e.g., CETUS token address)
+ * @param amount - Input amount as a string (e.g., "1000000000" for 1 SUI)
+ * @param amountOut - Minimum acceptable output amount as a string
+ * @returns Transaction result if successful and conditions met, otherwise null
+ */
+export const querySwap = async (
+    client: AggregatorClient, 
+    keypair: Ed25519Keypair, 
+    from: string, 
+    target: string, 
+    amount: string, 
+    amountOut: string
+) => {
     let router: any = null;
     let txb: any = null;
     let targetCoin: any = null;
@@ -32,7 +51,7 @@ export const querySwap = async (client: AggregatorClient, keypair: Ed25519Keypai
             target,
             amount: amountIn,
             byAmountIn: true,
-            providers: ["CETUS","SCALLOP","AFTERMATH","FLOWXV3","AFSUI","STEAMM","VOLO","KRIYAV3","KRIYA","ALPHAFI","FLOWX","BLUEMOVE","DEEPBOOKV3","BLUEFIN","HAEDAL","TURBOS","SPRINGSUI","STEAMM","HAWAL","OBRIC"]
+            providers: ["CETUS","CETUSDLMM","SCALLOP","AFTERMATH","FLOWXV3","AFSUI","STEAMM","VOLO","KRIYAV3","KRIYA","ALPHAFI","FLOWX","BLUEMOVE","DEEPBOOKV3","BLUEFIN","HAEDAL","TURBOS","SPRINGSUI","STEAMM","HAWAL","OBRIC","FULLSAIL","MAGMA","FERRACLMM","FERRADLMM"]
         });
 
         if (router === null) {
@@ -91,7 +110,18 @@ export const querySwap = async (client: AggregatorClient, keypair: Ed25519Keypai
     }
 }
 
-// Simple Swap Function
+/**
+ * Execute a simple swap using fast routing without conditional checking.
+ * This function finds optimal routing and executes the swap with specified slippage tolerance.
+ *
+ * @param client - Aggregator client instance for interacting with the Cetus aggregator
+ * @param keypair - Ed25519 keypair for signing transactions
+ * @param fromToken - Token address to swap from (e.g., SUI token address)
+ * @param toToken - Token address to swap to (e.g., USDC token address)
+ * @param amount - Input amount as a string (e.g., "500000000" for 0.5 SUI)
+ * @param slippage - Maximum acceptable slippage percentage (default: 0.01 for 1%)
+ * @returns Transaction result if successful, otherwise null
+ */
 export async function simpleSwap(
     client: AggregatorClient,
     keypair: Ed25519Keypair,
