@@ -17,6 +17,11 @@ const TOKENS = {
     AFSUI: "0xf325ce1300e8dac124071d3152c5c5ee6174914f8bc2161e88329cf579246efc::afsui::AFSUI",
 }
 
+const NO_PYTH_PROVIDERS = ['CETUS', 'KRIYA', 'FLOWX', 'FLOWXV3', 'KRIYAV3', 'TURBOS', 'AFTERMATH', 
+    'HAEDAL', 'VOLO', 'AFSUI', 'BLUEMOVE', 'DEEPBOOKV3', 'SCALLOP', 'SUILEND', 'BLUEFIN', 
+    'ALPHAFI', 'SPRINGSUI', 'STEAMM', 'METASTABLE', 'OBRIC', 'HAWAL', 'MOMENTUM', 'MAGMA', 
+    'SEVENK', 'FULLSAIL', 'CETUSDLMM', 'FERRADLMM', 'FERRACLMM'];
+
 /**
  * Execute a swap with conditional checking for minimum output amount.
  * This function finds optimal routing, validates the output meets minimum requirements,
@@ -51,7 +56,7 @@ export const querySwap = async (
             target,
             amount: amountIn,
             byAmountIn: true,
-            providers: ["CETUS","CETUSDLMM","SCALLOP","AFTERMATH","FLOWXV3","AFSUI","STEAMM","VOLO","KRIYAV3","KRIYA","ALPHAFI","FLOWX","BLUEMOVE","DEEPBOOKV3","BLUEFIN","HAEDAL","TURBOS","SPRINGSUI","STEAMM","HAWAL","OBRIC","FULLSAIL","MAGMA","FERRACLMM","FERRADLMM"]
+            providers: NO_PYTH_PROVIDERS
         });
 
         if (router === null) {
@@ -163,6 +168,71 @@ export async function simpleSwap(
     }
 }
 
+/**
+ * Calculate the price of base coin in terms of quote coin.
+ * This function finds the optimal routing for swapping a specified quote amount to base coin,
+ * then calculates the price as quote amount per base amount (e.g., USDC per SUI).
+ *
+ * @param client - Aggregator client instance for interacting with the Cetus aggregator
+ * @param baseCoinType - Address of the base coin (the coin whose price is being calculated)
+ * @param quoteCoinType - Address of the quote coin (the coin used to price the base coin)
+ * @param baseCoinDecimal - Decimal places of the base coin 
+ * @param quoteCoinDecimal - Decimal places of the quote coin (e.g., 9 for SUI, 6 for USDC)
+ * @param quoteAmount - Amount of quote coin to use for price calculation (in normal units, default: "100")
+ * @returns Price as a number representing quote amount per base amount (e.g., 3.5 means 1 base = 3.5 quote)
+ * @throws Error if no routes available or amountOut is zero
+ */
+export const getPrice = async (
+    client: AggregatorClient,
+    baseCoinType: string,
+    quoteCoinType: string,
+    baseCoinDecimal: number,
+    quoteCoinDecimal: number,
+    quoteAmount: string = "100",
+): Promise<number> => {
+    try {
+        // Convert quote amount to BN and scale to smallest units (considering decimals)
+        const quoteAmountBN = new BN(quoteAmount);
+        const quoteAmountInSmallestUnit = quoteAmountBN.mul(new BN(10).pow(new BN(quoteCoinDecimal)));
+
+        // Find optimal routing for swapping quote coin to base coin
+        const router = await client.findRouters({
+            from: quoteCoinType,
+            target: baseCoinType,
+            amount: quoteAmountInSmallestUnit,
+            byAmountIn: true,
+            providers: NO_PYTH_PROVIDERS
+        });
+
+        // Validate routing result
+        if (!router || !router.amountOut) {
+            throw new Error(`No routes available for ${quoteCoinType} -> ${baseCoinType}`);
+        }
+
+        // Get output amount in base coin (in smallest units) and convert to normal units
+        const baseAmountOut = router.amountOut;
+        const baseAmountInNormalUnit = baseAmountOut.div(new BN(10).pow(new BN(baseCoinDecimal)));
+
+        // Ensure non-zero output for price calculation
+        if (baseAmountInNormalUnit.isZero()) {
+            throw new Error(`Cannot calculate price: amountOut is zero for ${quoteCoinType} -> ${baseCoinType}`);
+        }
+
+        // Convert amounts to numbers for division
+        const quoteAmountNum = parseFloat(quoteAmountBN.toString());
+        const baseAmountNum = parseFloat(baseAmountInNormalUnit.toString());
+
+        // Calculate price: quote amount per base amount (e.g., USDC per SUI)
+        const price = quoteAmountNum / baseAmountNum;
+
+        return price;
+
+  } catch (error) {
+    console.error(`Error calculating price for ${baseCoinType} in ${quoteCoinType}:`, error);
+    throw error;
+  }
+};
+
 // Main execution
 async function main() {
     try {
@@ -211,6 +281,48 @@ async function main() {
             console.log("✅ Simple swap completed successfully");
         } else {
             console.log("❌ Simple swap failed");
+        }
+
+        // Example 3: Get price
+        console.log("\n=== Example 3: Get Price ===");
+        try {
+            // Get SUI price in USDC (1 SUI = ? USDC)
+            // Note: price is calculated as quote amount per base amount
+            // So for base=SUI, quote=USDC, result means USDC per SUI
+            const suiPriceInUSDC = await getPrice(
+                client,
+                TOKENS.SUI,        // base coin (the coin being priced)
+                TOKENS.USDC,       // quote coin (pricing currency)
+                9,                 // SUI decimals
+                6,                 // USDC decimals
+                "100"              // Use 100 USDC for price calculation
+            );
+            console.log(`✅ SUI price in USDC: ${suiPriceInUSDC.toFixed(6)} USDC per SUI`);
+
+            // Get CETUS price in USDC
+            const cetusPriceInUSDC = await getPrice(
+                client,
+                TOKENS.CETUS,      // base coin
+                TOKENS.USDC,       // quote coin
+                9,                 // CETUS decimals (assuming 9, adjust if different)
+                6,                 // USDC decimals
+                "100"              // Use 100 USDC for price calculation
+            );
+            console.log(`✅ CETUS price in USDC: ${cetusPriceInUSDC.toFixed(6)} USDC per CETUS`);
+
+            // Get CETUS price in SUI (cross rate)
+            const cetusPriceInSUI = await getPrice(
+                client,
+                TOKENS.CETUS,      // base coin
+                TOKENS.SUI,        // quote coin
+                9,                 // CETUS decimals
+                9,                 // SUI decimals
+                "100"             // Use 100 SUI for price calculation
+            );
+            console.log(`✅ CETUS price in SUI: ${cetusPriceInSUI.toFixed(6)} SUI per CETUS`);
+
+        } catch (priceError) {
+            console.error("❌ Price calculation failed:", priceError);
         }
 
     } catch (error) {
