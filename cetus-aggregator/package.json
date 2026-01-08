@@ -2,7 +2,7 @@
   "name": "claude-code-skill-cetus-aggregator",
   "version": "1.0.0",
   "description": "Claude Code skill for Cetus Aggregator SDK",
-  "main": "skill.md",
+  "main": "SKILL.md",
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0"
   },

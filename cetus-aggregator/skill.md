@@ -1,6 +1,24 @@
+---
+name: cetus-aggregator
+description: A Claude Code skill for working with the Cetus Aggregator SDK to execute optimized swaps across multiple Sui DEXs. Use this skill when you need to perform token swaps, find optimal routes across 30+ DEXs, execute gas-optimized transactions, or configure overlay fees on Sui blockchain.
+allowed-tools: [Bash, Read, Write, Edit, Glob, Grep]
+---
+
 # Cetus Aggregator SDK Skill
 
 A Claude Code skill for working with the Cetus Aggregator SDK to execute optimized swaps across multiple Sui DEXs. This skill provides comprehensive tools for multi-DEX routing, price discovery, and gas-optimized swap execution using the `@cetusprotocol/aggregator-sdk` library.
+
+## Instructions
+
+Use this skill when you need to execute token swaps on the Sui blockchain. Includes:
+
+1. **SDK Initialization**: Configure environment, wallet, and RPC connection
+2. **Multi-DEX Routing**: Find optimal price routes across 30+ DEXs
+3. **Swap Execution**: Execute fast swaps or manual route swaps
+4. **Slippage Protection**: Configure slippage tolerance to protect transactions
+5. **Gas Optimization**: Dynamic gas management and budget settings
+6. **Protocol Fees**: Configure overlay fees and recipient addresses
+7. **Error Handling**: Comprehensive error handling and market condition validation
 
 ## Quick Start
 
@@ -31,17 +49,17 @@ const client = new AggregatorClient({
 
 ### SDK Initialization
 - **Environment Configuration**: Mainnet/Testnet support
-- **Wallet Management**: Keypair derivation from mnemonics
+- **Wallet Management**: Derive keypairs from mnemonics
 - **RPC Configuration**: Custom RPC endpoint support
 
 ### Multi-DEX Routing
-- **30+ DEX Support**: Access to major Sui DEXs
+- **30+ DEX Support**: Access major Sui DEXs
 - **Optimal Price Discovery**: Best price routing across providers
-- **Provider Selection**: Customizable DEX provider lists
+- **Provider Selection**: Customizable DEX provider list
 
 ### Swap Execution
-- **Fast Router Swap**: Automatic coin management
-- **Manual Router Swap**: Advanced coin control
+- **Fast Router Swap**: Automatic token management
+- **Manual Router Swap**: Advanced token control
 - **Slippage Protection**: Configurable slippage tolerance
 
 ### Advanced Features
@@ -169,22 +187,9 @@ const filteredProviders = getProvidersExcluding(["CETUS", "KRIYA"])
 const specificProviders = getProvidersIncluding(["TURBOS", "AFTERMATH"])
 ```
 
-### Overlay Fee Configuration
+### Supported DEXs
 
-```typescript
-// Enable protocol fees
-const clientWithFee = new AggregatorClient({
-  signer: wallet,
-  client: suiClient,
-  env: Env.Mainnet,
-  overlayFeeRate: 0.001, // 0.1% fee
-  overlayFeeReceiver: "0x...protocol_fee_address...",
-})
-```
-
-## Supported DEXs
-
-The aggregator supports 30+ DEXs including:
+The aggregator supports 30+ DEXs, including:
 - **CETUS**, **KRIYA** (V2/V3), **FLOWX** (V2/V3), **TURBOS**, **AFTERMATH**
 - **HAEDAL**, **VOLO**, **AFSUI**, **BLUEMOVE**, **DEEPBOOKV3**
 - **SCALLOP**, **SUILEND**, **BLUEFIN**, **HAEDALPMM**, **ALPHAFI**
@@ -192,7 +197,7 @@ The aggregator supports 30+ DEXs including:
 - **MOMENTUM**, **STEAMM_OMM**, **STEAMM_OMM_V2**, **MAGMA**, **SEVENK**
 - **HAEDALHMMV2**, **FULLSAIL**
 
-## Common Token Types
+### Common Token Types
 
 ```typescript
 // Mainnet token types
@@ -317,37 +322,19 @@ async function executeOptimizedSwap() {
 }
 ```
 
-## Testing
-
-### Unit Testing
-```typescript
-import { AggregatorClient, Env } from '@cetusprotocol/aggregator-sdk'
-
-describe('Cetus Aggregator', () => {
-  test('client initialization', () => {
-    const client = new AggregatorClient({
-      signer: '0x...',
-      client: suiClient,
-      env: Env.Mainnet,
-    });
-    expect(client).toBeDefined();
-  });
-});
-```
-
 ## Dependencies
 
-- `@cetusprotocol/aggregator-sdk`: Core SDK library
-- `@mysten/sui`: Sui blockchain client
-- `bn.js`: Big number handling
-- TypeScript: Language support
+- `@cetusprotocol/aggregator-sdk`: ^1.4.2 (core SDK library)
+- `@mysten/sui`: ^1.45.0 (Sui blockchain client)
+- `bn.js`: ^5.2.0 (big number processing)
+- TypeScript: ^5.0.0 (language support)
 
 ## Support
 
-For issues and questions:
+If you encounter issues or have questions:
 - Check the official Cetus documentation
-- Review SDK error codes and messages
-- Test with testnet before mainnet deployment
+- Check SDK error codes and messages
+- Test on testnet before deploying to mainnet
 - Monitor gas usage and adjust budgets accordingly
 
 ---

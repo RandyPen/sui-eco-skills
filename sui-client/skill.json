@@ -10,7 +10,7 @@
   },
   "files": [
     "skill.json",
-    "README.md",
+    "SKILL.md",
     "examples/",
     "src/",
     "types/",
