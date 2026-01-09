@@ -1,0 +1,32 @@
+{
+  "name": "deepbook-trading",
+  "version": "1.0.0",
+  "description": "DeepBook trading skill for Claude Code - provides order book trading, flash loans, and market data queries on Sui blockchain",
+  "author": "Claude Code",
+  "license": "MIT",
+  "keywords": ["sui", "deepbook", "trading", "defi", "orderbook", "flashloan", "blockchain", "typescript"],
+  "dependencies": {
+    "@mysten/deepbook-v3": "^0.22.0",
+    "@mysten/sui": "^1.45.0"
+  },
+  "files": [
+    "skill.json",
+    "SKILL.md",
+    "examples/",
+    "src/",
+    "types/",
+    "templates/",
+    "tests/"
+  ],
+  "categories": ["blockchain", "trading", "defi", "development"],
+  "claudeCode": {
+    "skillType": "development",
+    "supportedLanguages": ["typescript", "javascript"],
+    "entryPoint": "src/index.ts",
+    "examples": [
+      "examples/01-basic-setup.ts",
+      "examples/03-limit-order.ts",
+      "templates/market-maker.ts"
+    ]
+  }
+}

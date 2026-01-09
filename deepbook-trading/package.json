@@ -1,0 +1,54 @@
+{
+  "name": "@claude-code/deepbook-trading-skill",
+  "version": "1.0.0",
+  "description": "DeepBook trading skill for Claude Code - provides order book trading, flash loans, and market data queries on Sui blockchain",
+  "main": "src/index.ts",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "example:basic": "tsx examples/01-basic-setup.ts",
+    "example:trading": "tsx examples/03-limit-order.ts"
+  },
+  "keywords": [
+    "sui",
+    "deepbook",
+    "trading",
+    "defi",
+    "orderbook",
+    "flashloan",
+    "blockchain",
+    "claude-code",
+    "skill"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "dependencies": {
+    "@mysten/deepbook-v3": "^0.26.3",
+    "@mysten/sui": "^1.45.2",
+    "@mysten/bcs": "^1.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "tsx": "^4.0.0",
+    "eslint": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "prettier": "^3.0.0"
+  },
+  "files": [
+    "src",
+    "types",
+    "examples",
+    "templates",
+    "tests",
+    "SKILL.md",
+    "skill.json"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "mainnet": {
+    "SUI_DBUSDC": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1"
+    },
+    "SUI_USDT": {
+      "baseType": "SUI",
+      "quoteType": "USDT",
+      "poolId": "0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1"
+    },
+    "SUI_USDC": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1"
+    }
+  },
+  "testnet": {
+    "SUI_DBUSDC": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    },
+    "SUI_DBUSDC_A": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    },
+    "SUI_DBUSDC_B": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x6dae5f2c8b7c0e6c5c9e9e5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5"
+    },
+    "SUI_USDT": {
+      "baseType": "SUI",
+      "quoteType": "USDT",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    },
+    "SUI_USDC": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    }
+  },
+  "devnet": {
+    "SUI_DBUSDC": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    },
+    "SUI_USDT": {
+      "baseType": "SUI",
+      "quoteType": "USDT",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    },
+    "SUI_USDC": {
+      "baseType": "SUI",
+      "quoteType": "USDC",
+      "poolId": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55"
+    }
+  }
+}
