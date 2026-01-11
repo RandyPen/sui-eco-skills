@@ -165,6 +165,42 @@ const info = await getActiveBinInfo('0x...your_pair_address...')
 console.log('Active bin information:', JSON.stringify(info, null, 2))
 ```
 
+## Optional: Get Bin Data for Analysis
+
+After getting active bin information, you may want to analyze liquidity in surrounding bins:
+
+```typescript
+// Get bins around the active bin for liquidity analysis
+const binRange: [number, number] = [activeId - 10, activeId + 10]
+const bins = await sdk.Pair.getPairBins(pair, binRange)
+
+console.log(`Liquidity in ${bins.length} bins around active bin (ID: ${activeId}):`)
+bins.forEach((bin, index) => {
+  const binId = binRange[0] + index
+  console.log(`  Bin ${binId}: X=${bin.reserve_x}, Y=${bin.reserve_y}`)
+})
+
+// Calculate total liquidity in the range
+const totalReserveX = bins.reduce((sum, bin) => sum + BigInt(bin.reserve_x), 0n)
+const totalReserveY = bins.reduce((sum, bin) => sum + BigInt(bin.reserve_y), 0n)
+console.log(`Total in range: X=${totalReserveX}, Y=${totalReserveY}`)
+```
+
+For complete bin metadata (prices, fees, total supply), use the API method:
+
+```typescript
+// Get complete bin data via API (may be cached)
+const allBinData = await sdk.Pair.getPairBinsData(pair.address)
+const binsAroundActive = allBinData.filter(bin =>
+  Math.abs(Number(bin.bin_id) - activeId) <= 10
+)
+
+console.log(`Found ${binsAroundActive.length} bins with complete metadata:`)
+binsAroundActive.forEach(bin => {
+  console.log(`  Bin ${bin.bin_id}: Price=${bin.price}, Supply=${bin.total_supply}`)
+})
+```
+
 ## Complete Example with Error Handling
 
 ```typescript

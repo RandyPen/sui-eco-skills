@@ -191,7 +191,52 @@ if (pair) {
 } else {
   console.log('Pair not found')
 }
+
+### 6. Getting Bin Data (`getPairBins` and `getPairBinsData`)
+
+Use `getPairBins` to fetch bin reserves directly from chain for a specific range:
+
+```typescript
+// Example from remove-liquidity.ts line 27
+const bins = await sdk.Pair.getPairBins(pair, [8445280, 8445287])
+console.log('Bins data:', bins)
+
+// Query a single bin (ID = 8445280):
+const singleBin = await sdk.Pair.getPairBins(pair, [8445280, 8445281])
+console.log('Single bin reserves:', singleBin[0])
+
+// Each bin contains:
+// {
+//   reserve_x: string,  // Token X reserves (as string)
+//   reserve_y: string   // Token Y reserves (as string)
+// }
 ```
+
+Use `getPairBinsData` to fetch complete bin information via API:
+
+```typescript
+// Get all bins data for a pair via API
+const binData = await sdk.Pair.getPairBinsData(pair.address)
+console.log('Total bins:', binData.length)
+
+// Format bins for swap calculations
+const formattedBins = formatBins(binData)
+
+// Each bin contains complete metadata:
+// {
+//   bin_id: bigint,      // Bin ID
+//   reserve_x: bigint,   // Token X reserves
+//   reserve_y: bigint,   // Token Y reserves
+//   price: bigint,       // Price in the bin
+//   total_supply: bigint, // Total liquidity supply
+//   fee_growth_x: bigint, // Fee growth for token X
+//   fee_growth_y: bigint  // Fee growth for token Y
+// }
+```
+
+**Key Differences:**
+- `getPairBins`: Chain direct query, real-time reserves only
+- `getPairBinsData`: API cached, complete metadata including prices and fees
 
 ## Dry-run vs Actual Execution Pattern
 

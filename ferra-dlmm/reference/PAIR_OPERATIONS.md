@@ -76,7 +76,77 @@ The returned `pair` object includes:
     // ... other reserves
   }
 }
+
+## Getting Bin Data
+
+### Get Bins for a Specific Range (Chain Query)
+
+Use `getPairBins` to fetch bin reserves directly from the chain for a specific range:
+
+```typescript
+// Example from remove-liquidity.ts line 27
+const bins = await sdk.Pair.getPairBins(pair, [8445280, 8445287])
+console.log('Bins data:', bins)
+
+// Each bin contains:
+// {
+//   reserve_x: string,  // Token X reserves in the bin (as string)
+//   reserve_y: string   // Token Y reserves in the bin (as string)
+// }
+
+// To query a single bin (ID = 8445280):
+const singleBin = await sdk.Pair.getPairBins(pair, [8445280, 8445281])
+console.log('Single bin:', singleBin[0])
 ```
+
+**Note:** `getPairBins` uses `devInspectTransactionBlock` to query chain state directly, providing real-time data without gas costs.
+
+### Get All Bins Data via API (Cached)
+
+Use `getPairBinsData` to fetch complete bin information including prices, total supply, and fee growth via API:
+
+```typescript
+// Get all bins data for a pair via API
+const binData = await sdk.Pair.getPairBinsData(pair.address)
+console.log('Total bins:', binData.length)
+
+// Format bins for swap calculations
+const formattedBins = formatBins(binData)
+
+// Each bin contains complete information:
+// {
+//   bin_id: bigint,      // Bin ID
+//   reserve_x: bigint,   // Token X reserves
+//   reserve_y: bigint,   // Token Y reserves
+//   price: bigint,       // Price in the bin
+//   total_supply: bigint, // Total liquidity supply
+//   fee_growth_x: bigint, // Fee growth for token X
+//   fee_growth_y: bigint  // Fee growth for token Y
+// }
+```
+
+**Note:** `getPairBinsData` uses HTTP API which may have caching delays but provides more comprehensive data.
+
+### Comparison Table
+
+| Feature | `getPairBins` | `getPairBinsData` |
+|---------|--------------|-------------------|
+| Data Source | **Chain direct query** (real-time) | **API with caching** |
+| Data Content | Reserves only (`reserve_x`, `reserve_y`) | Full bin metadata (price, supply, fees) |
+| Gas Cost | 0 (dev inspect) | 0 (HTTP request) |
+| Performance | RPC call per bin range | Single API call |
+| Recommended Use | Real-time reserve checks, single bin queries | Full liquidity analysis, swap calculations |
+
+### Parameters
+- `pair`: LBPair object obtained from `getPair()`
+- `binRange`: Tuple `[from, to]` specifying the bin ID range to fetch (left-closed, right-open)
+- Returns: Array of `PairBin` objects with reserve information
+
+### Use Cases
+1. **Liquidity analysis**: Check liquidity distribution across specific bin ranges
+2. **Swap calculations**: Provide bin data for accurate swap rate calculations
+3. **Position management**: Understand which bins have liquidity for position adjustments
+4. **Single bin queries**: Efficiently fetch individual bin reserves without getting all bins
 
 ## Adding Liquidity
 
