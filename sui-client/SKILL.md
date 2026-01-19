@@ -1,7 +1,6 @@
 ---
 name: sui-client
 description: Comprehensive SuiClient skill for interacting with the Sui blockchain using @mysten/sui SDK. Use this skill when you need to connect to Sui blockchain, read data, execute transactions, manage staking positions, or query network information.
-allowed-tools: [Bash, Read, Write, Edit, Glob, Grep]
 ---
 
 # SuiClient Skill

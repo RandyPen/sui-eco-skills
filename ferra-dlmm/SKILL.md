@@ -1,7 +1,6 @@
 ---
 name: working-with-ferra-dlmm
 description: "Helps developers work with the Ferra DLMM SDK for Discrete Liquidity Market Maker operations on Sui blockchain. Provides guidance on SDK initialization, pair creation, liquidity management, token swaps, and position handling. Use when working with DLMM pairs, adding/removing liquidity, creating trading pairs, or performing token swaps in the ferra-sdks monorepo."
-allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # Working with Ferra DLMM SDK

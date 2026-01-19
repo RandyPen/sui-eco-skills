@@ -1,7 +1,6 @@
 ---
 name: cetus-aggregator
 description: A Claude Code skill for working with the Cetus Aggregator SDK to execute optimized swaps across multiple Sui DEXs. Use this skill when you need to perform token swaps, find optimal routes across 30+ DEXs, execute gas-optimized transactions, or configure overlay fees on Sui blockchain.
-allowed-tools: [Bash, Read, Write, Edit, Glob, Grep]
 ---
 
 # Cetus Aggregator SDK Skill

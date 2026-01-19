@@ -1,7 +1,6 @@
 ---
 name: deepbook-trading
 description: Helps Claude Code understand DeepBook V3 SDK usage for order book trading, flash loans, fund management, and market data queries on Sui blockchain. Use when operating DeepBook DEX, executing trading strategies, or querying market data.
-allowed-tools: [Bash, Read, Write, Edit, Glob, Grep]
 ---
 
 # DeepBook Trading Skill

@@ -1,7 +1,6 @@
 ---
 name: sui-transaction-building
 description: "Helps Claude Code understand Sui blockchain transaction building, providing guidelines and examples for Transaction class, commands, input types, gas configuration, and serialization. Use when building blockchain transactions on Sui or when the user mentions transaction building, Transaction class, or Move calls."
-allowed-tools: Read, Glob, Grep, Bash, Edit, Write
 ---
 
 # Sui Transaction Building Skill

@@ -1,7 +1,6 @@
 ---
 name: sui-bcs
 description: "Helps Claude Code understand Sui blockchain's BCS (Binary Canonical Serialization) encoding, providing usage guidelines and examples for primitive types, composite types, Sui-specific types, serialization patterns, and transformation support. Use when working with BCS serialization in Sui development or when the user mentions BCS, binary serialization, or Move data encoding."
-allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # BCS (Binary Canonical Serialization) Skill

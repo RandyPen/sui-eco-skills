@@ -1,7 +1,6 @@
 ---
 name: sui-keypair-cryptography
 description: "Helps Claude Code understand Sui blockchain keypair and cryptography operations, providing guidelines and examples for key generation, signing, verification, address derivation, and multi-signature scheme support. Use when working with cryptography in Sui development or when the user mentions keypairs, cryptography, signing, or verification."
-allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # Keypair and Cryptography Skill
