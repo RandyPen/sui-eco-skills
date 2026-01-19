@@ -43,6 +43,28 @@ The Cetus Dynamic Liquidity Market Maker (DLMM) is a sophisticated automated mar
 - **Bun**: For running prettier-move formatter
 - **Git**: For dependency management
 
+### Installation
+
+#### Dependencies
+
+Add the following dependencies to your `Move.toml`:
+
+```toml
+[dependencies]
+CetusDlmm = { git = "https://github.com/CetusProtocol/cetus-dlmm-interface.git", subdir = "packages/dlmm", rev = "mainnet-v0.5.0", override = true }
+IntegerMate = { git = "https://github.com/CetusProtocol/integer-mate.git", rev = "mainnet-v1.3.0", override = true }
+MoveSTL = { git = "https://github.com/CetusProtocol/move-stl.git", rev = "mainnet-v1.3.0", override = true }
+```
+
+#### Address Configuration
+
+Configure the package address in your `Move.toml`:
+
+```toml
+[addresses]
+cetusdlmm = "0x0"  # Replace with actual deployed address
+```
+
 ### Project Structure
 ```
 cetus-dlmm-interface/
