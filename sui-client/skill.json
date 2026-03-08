@@ -1,26 +1,9 @@
 {
   "name": "sui-client",
-  "version": "1.0.0",
-  "description": "Comprehensive SuiClient skill for interacting with the Sui blockchain using @mysten/sui SDK",
-  "author": "Claude Code",
+  "version": "2.0.0",
+  "description": "Sui blockchain client skill - use gRPC or GraphQL (JSON-RPC deprecated)",
+  "author": "OpenCode",
   "license": "MIT",
-  "keywords": ["sui", "blockchain", "web3", "client", "typescript"],
-  "dependencies": {
-    "@mysten/sui": "^1.0.0"
-  },
-  "files": [
-    "skill.json",
-    "SKILL.md",
-    "examples/",
-    "src/",
-    "types/",
-    "templates/"
-  ],
-  "categories": ["blockchain", "web3", "development"],
-  "claudeCode": {
-    "skillType": "development",
-    "supportedLanguages": ["typescript", "javascript"],
-    "entryPoint": "src/index.ts",
-    "examples": ["examples/basic-usage.ts", "examples/transactions.ts"]
-  }
+  "keywords": ["sui", "blockchain", "web3", "grpc", "graphql"],
+  "categories": ["blockchain", "web3", "development"]
 }

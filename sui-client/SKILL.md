@@ -1,96 +1,255 @@
 ---
 name: sui-client
-description: Comprehensive SuiClient skill for interacting with the Sui blockchain using @mysten/sui SDK. Use this skill when you need to connect to Sui blockchain, read data, execute transactions, manage staking positions, or query network information.
+description: Interact with Sui blockchain using @mysten/sui SDK. Use when building transactions, reading chain data, or managing staking positions on Sui.
 ---
 
 # SuiClient Skill
 
-A comprehensive Claude Code skill for interacting with the Sui blockchain using the official `@mysten/sui` SDK.
-
-## Instructions
-
-Use this skill when you need to interact with the Sui blockchain. Includes:
-
-1. **Network Connection**: Connect to mainnet, testnet, devnet, or localnet
-2. **Data Reading**: Get tokens, objects, transactions, and balances
-3. **Transaction Execution**: Build, sign, and execute transactions
-4. **Network Information**: Get system state, gas prices, and protocol configuration
-5. **Move Package Interactions**: Query normalized Move data
-6. **Event Handling**: Query and subscribe to blockchain events
-7. **Staking Operations**: Manage staking positions
-8. **Error Handling**: Implement comprehensive error handling patterns
+Use this skill when working with Sui blockchain. JSON-RPC is deprecated - use **gRPC** or **GraphQL**.
 
 ## Quick Start
 
 ```typescript
-import { SuiClient } from '@mysten/sui/client';
+// gRPC (recommended) - @mysten/sui/grpc
+import { SuiGrpcClient } from "@mysten/sui/grpc";
+const client = new SuiGrpcClient({ network: "mainnet" });
 
-// Connect to mainnet
-const client = new SuiClient({
-  url: 'https://sui-mainnet.nodeinfra.com'
+// GraphQL - @mysten/sui/graphql
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
+const client = new SuiGraphQLClient({
+  network: "mainnet",
+  url: "https://your-graphql-endpoint/graphql",
+});
+```
+
+## Key Imports
+
+| Feature               | Import Path                    |
+| --------------------- | ------------------------------ |
+| gRPC Client           | `@mysten/sui/grpc`             |
+| GraphQL Client        | `@mysten/sui/graphql`          |
+| Transaction           | `@mysten/sui/transactions`     |
+| Keypairs              | `@mysten/sui/keypairs/ed25519` |
+| JSON-RPC (deprecated) | `@mysten/sui/jsonRpc`          |
+
+## API Methods
+
+### Objects
+
+```typescript
+// Get single object
+const obj = await client.getObject({
+  id: "0x...",
+  options: { showType: true, showContent: true },
 });
 
-// Get account balance
+// Get multiple objects
+const objs = await client.multiGetObjects({
+  ids: ["0x...", "0x..."],
+  options: { showType: true },
+});
+
+// List owned objects
+const owned = await client.listOwnedObjects({
+  owner: "0x...",
+  filter: { StructType: "0x2::coin::Coin" },
+});
+
+// Get dynamic field
+const field = await client.getDynamicField({
+  parentId: "0x...",
+  name: { type: "...", value: "..." },
+});
+
+// List dynamic fields
+const fields = await client.listDynamicFields({
+  parentId: "0x...",
+  limit: 50,
+});
+```
+
+### Coins & Balances
+
+```typescript
+// List coins (paginated) - NOTE: NOT getCoins
+const coins = await client.listCoins({
+  owner: "0x...",
+  coinType: "0x2::sui::SUI",
+  limit: 100,
+  cursor: "...",
+});
+
+// Get balance
 const balance = await client.getBalance({
-  owner: '0x123...',
-  coinType: '0x2::sui::SUI'
+  owner: "0x...",
+  coinType: "0x2::sui::SUI",
+});
+
+// List all balances
+const balances = await client.listBalances({ owner: "0x..." });
+
+// Get coin metadata
+const meta = await client.getCoinMetadata({
+  coinType: "0x2::sui::SUI",
 });
 ```
 
-## Installation
+### Transactions
 
-```bash
-# Install the skill
-claude skills install sui-client
+```typescript
+import { Transaction } from "@mysten/sui/transactions";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 
-# Install dependencies
-bun add @mysten/sui
+const keypair = Ed25519Keypair.fromSecretKey("...");
+const tx = new Transaction();
+
+// Build transaction...
+tx.moveCall({ target: "0x...::module::function" });
+
+// Execute transaction
+const result = await client.signAndExecuteTransaction({
+  transaction: tx,
+  signer: keypair,
+  options: { showEffects: true },
+});
+
+// Wait for transaction
+const confirmed = await client.waitForTransaction({
+  digest: result.digest,
+  options: { showEffects: true },
+});
+
+// Simulate transaction (dry run)
+const simulated = await client.simulateTransaction({
+  transaction: tx,
+  signer: keypair.getPublicKey(),
+});
+
+// Get transaction
+const txResult = await client.getTransaction({
+  digest: "...",
+  options: { showEffects: true, showObjectChanges: true },
+});
 ```
 
-## Features
+### Network Info
 
-- **Client Management**: Connect to mainnet, testnet, devnet, and localnet
-- **Data Reading**: Get tokens, objects, transactions, and balances
-- **Transaction Execution**: Build, sign, and execute transactions
-- **Network Information**: Get system state, gas prices, and protocol configuration
-- **Move Package Interactions**: Query normalized Move data
-- **Event Handling**: Query and subscribe to blockchain events
-- **Staking Operations**: Manage staking positions
-- **Error Handling**: Comprehensive error handling patterns
+```typescript
+// Get reference gas price
+const gasPrice = await client.getReferenceGasPrice();
 
-## Examples
+// Get current system state (NOT getLatestSuiSystemState)
+const state = await client.getCurrentSystemState();
 
-Check the `examples/` directory for complete usage examples:
+// Get chain identifier
+const chainId = await client.getChainIdentifier();
 
-- `basic-usage.ts` - Basic client setup and data reading
-- `transactions.ts` - Transaction building and execution
-- `advanced.ts` - Advanced patterns and error handling
+// Get protocol config
+const config = await client.getProtocolConfig();
 
-## API Reference
+// Get current epoch
+const epoch = await client.getCurrentEpoch();
+```
 
-This skill provides comprehensive coverage of the SuiClient API including:
+### Move Package
 
-- **Reading Data**: `getObject()`, `getCoins()`, `getTransactionBlock()`
-- **Writing Data**: `signAndExecuteTransaction()`, `executeTransactionBlock()`
-- **Network Information**: `getLatestSuiSystemState()`, `getReferenceGasPrice()`
-- **Events**: `queryEvents()`, `subscribeEvent()`
-- **Staking**: `getStakes()`, `getStakesByIds()`
+```typescript
+// Get Move function metadata
+const func = await client.getMoveFunction({
+  package: "0x...",
+  module: "...",
+  function: "...",
+});
+```
 
-## Detailed Documentation
+### Name Service
 
-- [Source Code](src/index.ts) - Complete SuiClient API implementation
-- [Type Definitions](types/index.d.ts) - TypeScript type definitions
-- [Code Templates](templates/) - Common code templates
-- [Example Code](examples/) - Complete usage examples
+```typescript
+// Resolve address to .sui name
+const name = await client.defaultNameServiceName({
+  address: "0x...",
+});
+```
+
+### zkLogin
+
+```typescript
+// Verify zkLogin signature
+const result = await client.verifyZkLoginSignature({
+  bytes: "...",
+  signature: "...",
+  intentScope: "TransactionData",
+  address: "0x...",
+});
+```
+
+## gRPC-Specific Features
+
+```typescript
+const client = new SuiGrpcClient({ network: "mainnet" });
+
+// Direct service access
+client.transactionExecutionService;
+client.ledgerService;
+client.stateService;
+client.subscriptionService;
+client.movePackageService;
+client.signatureVerificationService;
+client.nameService;
+
+// MVR support (transaction simulation)
+client.mvr.resolvePackage({ package: "0x..." });
+client.mvr.resolveType({ type: "0x..." });
+client.mvr.resolve({ packages: ["0x..."] });
+```
+
+## GraphQL-Specific Features
+
+```typescript
+import { graphql } from '@mysten/sui/graphql/schema';
+
+const client = new SuiGraphQLClient({
+  network: 'mainnet',
+  url: 'https://.../graphql',
+  queries: {
+    myQuery: graphql(`
+      query getBalance($owner: SuiAddress!) {
+        address(owner: $owner) {
+          balance { totalBalance }
+        }
+      }
+    `)
+  }
+});
+
+// Execute predefined query
+const result = await client.execute('myQuery', {
+  variables: { owner: '0x...' }
+});
+
+// Execute inline query
+const inline = await client.query({
+  query: graphql(`query { ... }`),
+  variables: { ... }
+});
+```
+
+## NOT Available in gRPC/GraphQL (use JSON-RPC for now)
+
+- `getStakes` / `getStakesByIds` - Staking queries
+- `queryEvents` / `subscribeEvent` - Event queries
+- `getCoins` - Use `listCoins` instead
+
+## Network Endpoints
+
+Contact your RPC provider for current endpoints. JSON-RPC (deprecated):
+
+- mainnet: `https://fullnode.mainnet.sui.io:443`
+- testnet: `https://fullnode.testnet.sui.io:443`
+- devnet: `https://fullnode.devnet.sui.io:443`
 
 ## Dependencies
 
-- `@mysten/sui`: ^1.45.0 (managed via package.json)
-
-## Contributing
-
-Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
-
-## License
-
-MIT
+```bash
+bun add @mysten/sui
+```
