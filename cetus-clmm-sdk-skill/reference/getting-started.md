@@ -47,8 +47,8 @@ import CetusClmmSDK from '@cetusprotocol/sui-clmm-sdk'
 
 const sdk = CetusClmmSDK.createCustomSDK({
   env: 'mainnet',
-  fullRpcUrl: 'https://fullnode.mainnet.sui.io',
-  swapCountRpcUrl: 'https://fullnode.mainnet.sui.io',
+  fullRpcUrl: 'grpc://fullnode.mainnet.sui.io:443',
+  swapCountRpcUrl: 'grpc://fullnode.mainnet.sui.io:443',
 
   // Cetus protocol configuration
   cetus_config: {
@@ -106,8 +106,8 @@ const keypair = Ed25519Keypair.fromSecretKey(privateKey)
 // Or generate a new keypair
 const keypair = new Ed25519Keypair()
 
-// Create Sui client
-const suiClient = new SuiClient({ url: 'https://fullnode.mainnet.sui.io' })
+// Create Sui client with gRPC
+const suiClient = new SuiClient({ url: 'grpc://fullnode.mainnet.sui.io:443' })
 
 // Set sender address in SDK
 sdk.setSenderAddress(keypair.getPublicKey().toSuiAddress())
@@ -165,22 +165,22 @@ async function getAccountPositions(sdk: CetusClmmSDK, accountAddress: string) {
 
 ### Mainnet Configuration
 - **Network**: Sui Mainnet
-- **RPC URL**: `https://fullnode.mainnet.sui.io`
+- **gRPC URL**: `grpc://fullnode.mainnet.sui.io:443`
 - **Package IDs**: Pre-configured in `clmmMainnet` constant
 - **Use for**: Production applications
 
 ### Testnet Configuration
 - **Network**: Sui Testnet
-- **RPC URL**: `https://fullnode.testnet.sui.io`
+- **gRPC URL**: `grpc://fullnode.testnet.sui.io:443`
 - **Package IDs**: Pre-configured in `clmmTestnet` constant
 - **Use for**: Development and testing
 
-### Custom RPC Endpoints
+### Custom gRPC Endpoints
 ```typescript
 const sdk = CetusClmmSDK.createCustomSDK({
   env: 'mainnet',
-  fullRpcUrl: 'https://custom-rpc.sui.io',  // Your custom RPC
-  swapCountRpcUrl: 'https://custom-rpc.sui.io',
+  fullRpcUrl: 'grpc://custom-grpc.sui.io:443',  // Your custom gRPC
+  swapCountRpcUrl: 'grpc://custom-grpc.sui.io:443',
   // ... other configurations
 })
 ```

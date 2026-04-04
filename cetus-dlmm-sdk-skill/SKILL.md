@@ -5,6 +5,9 @@ description: Guides users on how to use the Cetus DLMM TypeScript SDK for liquid
 
 # Cetus DLMM TypeScript SDK Usage Guide
 
+## Overview
+Cetus DLMM (Dynamic Liquidity Market Maker) SDK v2 provides comprehensive tools for interacting with Cetus Protocol's DLMM on Sui blockchain. The SDK supports liquidity management, pool operations, swaps, and position management with multiple strategy types.
+
 ## Quick Start
 
 ### Installation
@@ -13,38 +16,50 @@ npm install @cetusprotocol/dlmm-sdk
 ```
 
 ### SDK Initialization
-Cetus DLMM SDK provides multiple initialization methods:
 
-**Method 1: Use default configuration (Mainnet)**
+**Option 1: Use default mainnet configuration**
 ```typescript
 import { CetusDlmmSDK } from '@cetusprotocol/dlmm-sdk'
 
-const sdk = CetusDlmmSDK.createSDK({ env: 'mainnet' })
-sdk.setSenderAddress(walletAddress)
+const sdk = CetusDlmmSDK.createSDK()
 ```
 
-**Method 2: Use Testnet**
+**Option 2: Specify network environment**
 ```typescript
+// For mainnet
+const sdk = CetusDlmmSDK.createSDK({ env: 'mainnet' })
+
+// For testnet
 const sdk = CetusDlmmSDK.createSDK({ env: 'testnet' })
 ```
 
-**Method 3: Custom Configuration**
+**Option 3: Use custom gRPC endpoint**
 ```typescript
-const sdk = CetusDlmmSDK.createCustomSDK({
+const sdk = CetusDlmmSDK.createSDK({ 
   env: 'mainnet',
-  // Custom configuration parameters
+  full_rpc_url: 'YOUR_GRPC_ENDPOINT' 
 })
 ```
 
-**Method 4: Set Sender Address**
+**Option 4: Use custom SuiClient**
 ```typescript
-sdk.setSenderAddress('0xYourWalletAddress')
+import { SuiClient } from '@mysten/sui/client'
+
+const suiClient = new SuiClient({ url: 'grpc://fullnode.mainnet.sui.io:443' })
+const sdk = CetusDlmmSDK.createSDK({ env: 'mainnet', sui_client: suiClient })
 ```
 
-### Basic Configuration
-- **Network Selection**: `mainnet` or `testnet`
-- **Wallet Address**: Must set sender address to execute transactions
-- **RPC Configuration**: Supports custom RPC endpoints
+**Set Sender Address**
+```typescript
+const wallet = 'YOUR_WALLET_ADDRESS'
+sdk.setSenderAddress(wallet)
+```
+
+**Update RPC URL**
+```typescript
+const new_rpc_url = 'YOUR_NEW_FULL_NODE_URL'
+sdk.updateFullRpcUrl(new_rpc_url)
+```
 
 ## Core Concepts
 
@@ -72,50 +87,478 @@ DLMM (Dynamic Liquidity Market Maker) is Cetus Protocol's next-generation AMM pr
 - **Protocol Fee**: Portion of fees collected by the protocol
 - **Partner Fee**: Fee sharing for referred partners
 
-## Key Feature Overview
+## Default Fee Options
 
-### Liquidity Management
-Provides complete functionality for adding, removing, and managing liquidity. Supports three strategy types and flexible price range settings.
+The SDK provides predefined fee configurations for different types of trading pairs:
 
-**Detailed Guide**: See [Liquidity Management Guide](examples/liquidity-management.md) for:
-- Complete add liquidity workflow
-- Applicable scenarios and configuration for different strategies
-- Real examples based on `add_liquidity_spot.test.ts`
+```typescript
+const dlmmDefaultFeeOptions = [
+  { binStep: 1, baseFactor: 10000, fee: '0.0001' },
+  { binStep: 1, baseFactor: 20000, fee: '0.0002' },
+  { binStep: 2, baseFactor: 15000, fee: '0.0003' },
+  { binStep: 2, baseFactor: 20000, fee: '0.0004' },
+  { binStep: 5, baseFactor: 10000, fee: '0.0005' },
+  { binStep: 10, baseFactor: 10000, fee: '0.001' },
+  { binStep: 15, baseFactor: 10000, fee: '0.0015' },
+  { binStep: 20, baseFactor: 10000, fee: '0.002' },
+  { binStep: 25, baseFactor: 10000, fee: '0.0025' },
+  { binStep: 30, baseFactor: 10000, fee: '0.003' },
+  { binStep: 50, baseFactor: 8000, fee: '0.004' },
+  { binStep: 80, baseFactor: 7500, fee: '0.006' },
+  { binStep: 100, baseFactor: 8000, fee: '0.008' },
+  { binStep: 100, baseFactor: 10000, fee: '0.01' },
+  { binStep: 200, baseFactor: 10000, fee: '0.02' },
+  { binStep: 400, baseFactor: 10000, fee: '0.04' }
+]
+```
 
-### Swap Operations
-Execute token swaps, supporting exact input/output modes and slippage protection.
+**Fee Tier Recommendations:**
+- **Low fees (0.01% - 0.05%)**: Best for stable pairs or low-volatility mainstream assets
+- **Medium fees (0.1% - 0.3%)**: Suitable for medium-volatility assets or mainstream trading pairs
+- **High fees (0.4% - 4%)**: Recommended for high-volatility assets, altcoins, or small market cap pairs
 
-**Detailed Guide**: See [Swap Operations Guide](examples/swap-operations.md) for:
-- Usage examples of `preSwapQuote()` and `swapPayload()`
-- Slippage protection and fee calculations
-- Transaction verification and error handling
+## Core Operations
 
-### Position Management
-Manage position lifecycle, including opening positions, adding/removing liquidity, closing positions, and fee collection.
+### 1. Pool Operations
 
-**Detailed Guide**: See [Position Management Guide](examples/position-management.md) for:
-- Usage examples of `open_position()` and `close_position()`
-- Batch fee collection with `collectRewardAndFeePayload()`
-- Complete workflow based on `PositionModule`
+#### Get Pool Information
+```typescript
+// Get all pools
+const pools = await sdk.Pool.getPools()
 
-### Pool Management
-Create and manage DLMM pools, configure fee structures and strategy parameters.
+// Get specific pool
+const pool = await sdk.Pool.getPool(pool_id)
 
-**Detailed Guide**: See [Pool Management Guide](examples/pool-management.md) for:
-- Parameter configuration for `createPoolPayload()`
-- Fee rate and strategy type settings
-- Pool information queries and status monitoring
+// Get specific pools by their IDs
+const assign_pools = await sdk.Pool.getAssignPoolList([
+  '0x...',
+])
 
-### Utility Functions
-Provides utility functions for price calculations, fee calculations, and liquidity calculations.
+// Get bin information
+const bin_info = await sdk.Pool.getBinInfo(pool_id, bin_id, bin_step)
 
-**Detailed Reference**: See [Utility Functions Reference](api-reference/tool-functions.md) for:
-- **BinUtils**: Price-to-Bin ID conversion, sqrt price calculations
-- **FeeUtils**: Fee calculations, protocol fee distribution
+// Get pool bin information
+const pool_bin_info = await sdk.Pool.getPoolBinInfo(pool_id)
 
-## Cetus DLMM SDK Usage Workflow
+// Get bin step configurations
+const bin_step_configs = await sdk.Pool.getBinStepConfigs()
 
-Copy this checklist and track progress:
+// Get pool transaction list
+const pool_transactions = await sdk.Pool.getPoolTransactionList({
+  pool_id: '0x...',
+  pagination_args: { limit: 10 }
+})
+```
+
+#### Create Pool
+
+**Method 1: Create Pool Only**
+```typescript
+const bin_step = 2
+const base_factor = 10000
+const price = '1.1'
+const active_id = BinUtils.getBinIdFromPrice(price, bin_step, true, 6, 6)
+
+const tx = new Transaction()
+await sdk.Pool.createPoolPayload({
+  active_id,
+  bin_step,
+  coin_type_a: '0x...::usdc::USDC',
+  coin_type_b: '0x...::usdt::USDT',
+  base_factor,
+}, tx)
+```
+
+**Method 2: Create Pool and Add Liquidity in One Transaction**
+```typescript
+const bin_infos = sdk.Position.calculateAddLiquidityInfo({
+  active_id,
+  bin_step,
+  lower_bin_id: active_id - 10,
+  upper_bin_id: active_id + 10,
+  amount_a_in_active_bin: '0',
+  amount_b_in_active_bin: '0',
+  strategy_type: StrategyType.Spot,
+  coin_amount: '10000000',
+  fix_amount_a: true,
+})
+
+const createAndAddTx = await sdk.Pool.createPoolAndAddLiquidityPayload({
+  active_id,
+  lower_bin_id: active_id - 10,
+  upper_bin_id: active_id + 10,
+  bin_step,
+  bin_infos,
+  coin_type_a: '0x...::usdc::USDC',
+  coin_type_b: '0x...::eth::ETH',
+  strategy_type: StrategyType.Spot,
+  use_bin_infos: false,
+  base_factor,
+})
+```
+
+### 2. Position Operations
+
+#### Get Position Information
+```typescript
+// Get owner's position list
+const positions = await sdk.Position.getOwnerPositionList(wallet)
+
+// Get specific position
+const position = await sdk.Position.getPosition(position_id)
+```
+
+#### Add Liquidity
+
+**Step 1: Calculate liquidity distribution**
+```typescript
+const calculateOption = {
+  pool_id: '0x...',
+  amount_a: '1000000',
+  amount_b: '1200000',
+  active_id: 100,
+  bin_step: 2,
+  lower_bin_id: 90,
+  upper_bin_id: 110,
+  amount_a_in_active_bin: '0',
+  amount_b_in_active_bin: '0',
+  strategy_type: StrategyType.Spot
+}
+const bin_infos = await sdk.Position.calculateAddLiquidityInfo(calculateOption)
+```
+
+**Step 2: Create transaction payload for new position**
+```typescript
+const addOption = {
+  pool_id,
+  bin_infos,
+  coin_type_a: '0x...::usdc::USDC',
+  coin_type_b: '0x...::usdt::USDT',
+  lower_bin_id: 90,
+  upper_bin_id: 110,
+  active_id: 100,
+  strategy_type: StrategyType.Spot,
+  use_bin_infos: false,
+  max_price_slippage: 0.01,
+  bin_step: 2
+}
+const tx = sdk.Position.addLiquidityPayload(addOption)
+```
+
+**Add Liquidity to Existing Position**
+```typescript
+const addOption = {
+  pool_id,
+  bin_infos,
+  coin_type_a,
+  coin_type_b,
+  active_id,
+  position_id,
+  collect_fee: true,
+  reward_coins: [],
+  strategy_type: StrategyType.Spot,
+  use_bin_infos: false,
+  max_price_slippage: 0.01,
+  bin_step,
+}
+const tx = sdk.Position.addLiquidityPayload(addOption)
+```
+
+#### Add Liquidity with Price
+```typescript
+const addOption = {
+  pool_id,
+  bin_infos,
+  coin_type_a: pool.coin_type_a,
+  coin_type_b: pool.coin_type_b,
+  price_base_coin: 'coin_a',
+  price: price.toString(),
+  lower_price,
+  upper_price,
+  bin_step,
+  amount_a_in_active_bin: amounts_in_active_bin?.amount_a || '0',
+  amount_b_in_active_bin: amounts_in_active_bin?.amount_b || '0',
+  strategy_type: StrategyType.Spot,
+  decimals_a: 6,
+  decimals_b: 6,
+  max_bin_slippage: 0.01,
+  active_id,
+  use_bin_infos: false,
+}
+const tx = sdk.Position.addLiquidityWithPricePayload(addOption)
+```
+
+#### Remove Liquidity
+```typescript
+// Calculate removal amounts
+const calculateOption = {
+  bins: liquidity_shares_data.bins,
+  active_id,
+  fix_amount_a: true,
+  coin_amount: '100000'
+}
+const bin_infos = sdk.Position.calculateRemoveLiquidityInfo(calculateOption)
+
+// Build and send transaction
+const removeOption = {
+  pool_id,
+  bin_infos,
+  coin_type_a: pool.coin_type_a,
+  coin_type_b: pool.coin_type_b,
+  position_id,
+  active_id,
+  slippage: 0.01,
+  reward_coins: [],
+  collect_fee: true,
+  bin_step,
+  remove_percent: 0.5,
+}
+const tx = sdk.Position.removeLiquidityPayload(removeOption)
+```
+
+#### Close Position
+```typescript
+// Close position (This will collect all fees, rewards and remove all liquidity)
+const tx = sdk.Position.closePositionPayload({
+  pool_id,
+  position_id,
+  coin_type_a,
+  coin_type_b,
+  reward_coins: pool.reward_manager.rewards.map(reward => reward.reward_coin)
+})
+
+// Simulate or send the transaction
+const sim_result = await sdk.FullClient.sendSimulationTransaction(tx, wallet)
+```
+
+### 3. Fee Operations
+
+#### Fee and Reward Calculation
+```typescript
+// First get the pool information
+const pool = await sdk.Pool.getPool(pool_id)
+const { id, coin_type_a, coin_type_b, reward_manager } = pool
+
+// Fetch fee and reward data
+const { feeData, rewardData } = await sdk.Position.fetchPositionFeeAndReward([
+  {
+    pool_id: id,
+    position_id: position_id,
+    reward_coins: reward_manager.rewards.map((reward) => reward.reward_coin),
+    coin_type_a,
+    coin_type_b,
+  },
+])
+```
+
+#### Fee Rate Calculations
+```typescript
+// Get total fee rate for a pool
+const totalFeeRate = await sdk.Pool.getTotalFeeRate({
+  pool_id,
+  coin_type_a,
+  coin_type_b
+})
+
+// Get variable fee from pool parameters
+const variableFee = FeeUtils.getVariableFee(pool.variable_parameters)
+```
+
+#### FeeUtils Utility Methods
+
+```typescript
+import { FeeUtils, d, FEE_PRECISION } from '@cetusprotocol/dlmm-sdk'
+
+// Get variable fee
+const variableFee = FeeUtils.getVariableFee(pool.variable_parameters)
+const variableFeePercentage = d(variableFee).div(d(FEE_PRECISION)).toString()
+
+// Calculate composition fee
+const compositionFee = FeeUtils.calculateCompositionFee(amount, total_fee_rate)
+
+// Calculate protocol fee
+const protocolFee = FeeUtils.calculateProtocolFee(fee_amount, protocol_fee_rate)
+
+// Get protocol fees for both tokens
+const { protocol_fee_a, protocol_fee_b } = FeeUtils.getProtocolFees(fee_a, fee_b, protocol_fee_rate)
+
+// Get composition fees
+const { fees_a, fees_b } = FeeUtils.getCompositionFees(active_bin, used_bin, variableParameters)
+```
+
+#### Fee and Reward Collection
+```typescript
+// Build collect fee and reward transaction
+const tx = await sdk.Position.collectRewardAndFeePayload([{
+  pool_id,
+  position_id,
+  reward_coins: reward_manager.rewards.map((reward) => reward.reward_coin),
+  coin_type_a,
+  coin_type_b
+}])
+
+// Simulate or send the transaction
+const sim_result = await sdk.FullClient.sendSimulationTransaction(tx, wallet)
+```
+
+### 4. Swap Operations
+```typescript
+// Get pool information
+const pool = await sdk.Pool.getPool(pool_id)
+const { coin_type_a, coin_type_b } = pool
+
+// Get swap quote
+const quote_obj = await sdk.Swap.preSwapQuote({
+  pool_id,
+  a2b: true, // true for A to B, false for B to A
+  by_amount_in: true, // true for exact input, false for exact output
+  in_amount: '2000000',
+  coin_type_a,
+  coin_type_b
+})
+
+// Build and send swap transaction
+const tx = sdk.Swap.swapPayload({
+  coin_type_a,
+  coin_type_b,
+  quote_obj,
+  by_amount_in: true,
+  slippage: 0.01
+})
+```
+
+### 5. Partner Operations
+```typescript
+// Get partner list
+const partnerList = await sdk.Partner.getPartnerList()
+
+// Get specific partner
+const partner = await sdk.Partner.getPartner(partner_id)
+
+// Create partner
+const start_time = Math.floor(Date.now() / 1000) + 5000
+const tx = sdk.Partner.createPartnerPayload({
+  name: 'test partner',
+  ref_fee_rate: 0.01,
+  start_time,
+  end_time: start_time + 9 * 24 * 3600,
+  recipient: account,
+})
+
+// Update referral fee rate
+const updateFeeTx = await sdk.Partner.updateRefFeeRatePayload({
+  partner_id: '0x..',
+  ref_fee_rate: 0.02,
+})
+
+// Claim ref fee
+const tx = await sdk.Position.claimRefFeePayload({
+  partner_id: "0x..",
+  partner_cap_id: "0x..",
+  fee_coin_types: [coin_type]
+})
+```
+
+### 6. Reward Operations
+```typescript
+// Initialize rewards for a pool
+const initTx = sdk.Reward.initRewardPayload({
+  pool_id,
+  reward_coin_types: ['0x2::sui::SUI', '0x5::usdc::USDC']
+})
+
+// Add reward to a pool
+const addRewardTx = sdk.Reward.addRewardPayload({
+  pool_id,
+  reward_coin_type: '0x2::sui::SUI',
+  reward_amount: '1000000',
+  end_time_seconds: Math.floor(Date.now() / 1000) + 30 * 24 * 3600,
+  start_time_seconds: Math.floor(Date.now() / 1000) + 3600,
+})
+
+// Update reward access (public/private)
+const accessTx = sdk.Reward.updateRewardAccessPayload({
+  pool_id,
+  type: 'to_public',
+})
+```
+
+### 7. Configuration Management
+```typescript
+// Get global DLMM configuration
+const globalConfig = await sdk.Config.getDlmmGlobalConfig()
+
+// Get bin step configuration list
+const binStepConfigs = await sdk.Config.getBinStepConfigList(pool_id)
+
+// Fetch all SDK configurations
+const sdkConfigs = await sdk.Config.fetchDlmmSdkConfigs()
+
+// Get reward period emission data
+const rewardEmission = await sdk.Reward.getRewardPeriodEmission(
+  reward_manager_id,
+  reward_period,
+  current_time
+)
+```
+
+### 8. BinUtils Operations
+```typescript
+import { BinUtils } from '@cetusprotocol/dlmm-sdk'
+
+// Convert price to bin ID
+const binId = BinUtils.getBinIdFromPrice('1040.07', 2, true, 6, 9)
+
+// Convert bin ID to price
+const price = BinUtils.getPriceFromBinId(-4787, 2, 6, 9)
+
+// Get Q price from bin ID
+const q_price = BinUtils.getQPriceFromId(-4400, 100)
+
+// Get price per lamport from Q price
+const price_per_lamport = BinUtils.getPricePerLamportFromQPrice(q_price)
+
+// Get liquidity from amounts
+const liquidity = BinUtils.getLiquidity('0', '266666', '18431994054197767090')
+
+// Get amount A from liquidity
+const amountA = BinUtils.getAmountAFromLiquidity('4101094304427826916657468', '18461505896777422276')
+
+// Get amount B from liquidity
+const amountB = BinUtils.getAmountBFromLiquidity('4919119455159831291232256')
+
+// Split bin liquidity info
+const split_bin_infos = BinUtils.splitBinLiquidityInfo(bin_infos, 0, 70)
+
+// Get position count between bin ranges
+const positionCount = BinUtils.getPositionCount(-750, 845)
+
+// Find min/max bin ID for a given bin step
+const { minBinId, maxBinId } = BinUtils.findMinMaxBinId(10)
+```
+
+### 9. Advanced Operations
+
+#### Validate Active ID Slippage
+```typescript
+const isValid = await sdk.Position.validateActiveIdSlippage({
+  pool_id,
+  active_id,
+  max_bin_slippage: 0.01
+})
+```
+
+#### Update Position Fee and Rewards
+```typescript
+await sdk.Position.updatePositionFeeAndRewards({
+  pool_id,
+  position_id,
+  coin_type_a,
+  coin_type_b
+})
+```
+
+## Usage Workflow
 
 ```
 Cetus DLMM SDK Usage Progress:
@@ -129,73 +572,56 @@ Cetus DLMM SDK Usage Progress:
 - [ ] Step 8: Verify results and handle exceptions
 ```
 
-## Operation Selection Workflow
+## Troubleshooting
 
-### 1. Determine Your Needs
+### Common Issues
 
-**Need to provide liquidity?** → Select "Liquidity Management" workflow
-**Need to execute a trade?** → Select "Swap Operations" workflow
-**Need to manage existing positions?** → Select "Position Management" workflow
-**Need to create a new pool?** → Select "Pool Management" workflow
+**1. Transaction Simulation Failures**
+```typescript
+// Always simulate transactions before sending
+const simResult = await sdk.FullClient.sendSimulationTransaction(tx, wallet)
+if (simResult.effects.status.status === 'failure') {
+  console.error('Transaction simulation failed:', simResult.effects.status.error)
+}
+```
 
-### 2. Liquidity Management Workflow
-1. Refer to [Liquidity Management Guide](examples/liquidity-management.md)
-2. Select appropriate strategy type (Spot/BidAsk/Curve)
-3. Use BinUtils to calculate price range
-4. Call `calculateAddLiquidityInfo()` to calculate liquidity distribution
-5. Create and execute transaction
+**2. Insufficient Gas Budget**
+```typescript
+// Set appropriate gas budget for complex operations
+tx.setGasBudget(10000000000) // 10 SUI
+```
 
-### 3. Swap Operations Workflow
-1. Refer to [Swap Operations Guide](examples/swap-operations.md)
-2. Get pre-swap quote with `preSwapQuote()`
-3. Set appropriate slippage protection
-4. Execute swap transaction with `swapPayload()`
-5. Verify transaction results
+**3. Active Bin Range Validation**
+```typescript
+const amounts_in_active_bin = await sdk.Position.getActiveBinIfInRange(
+  pool.bin_manager.bin_manager_handle,
+  lower_bin_id,
+  upper_bin_id,
+  active_id,
+  bin_step
+)
+```
 
-### 4. Other Workflows
-Refer to the respective detailed guides for complete guidance.
+**4. Price Slippage Protection**
+```typescript
+const isValid = await sdk.Position.validateActiveIdSlippage({
+  pool_id,
+  active_id,
+  max_bin_slippage: 0.01
+})
+```
 
-## Frequently Asked Questions
+### Debugging Tips
+1. Use `printTransaction` to debug transaction details
+2. Always verify pool state before operations
+3. Parse and validate position liquidity shares
+4. Test with small amounts first
 
-### 1. How to handle transaction failures?
-- **Check parameters**: Ensure all parameter formats are correct
-- **Verify balance**: Confirm wallet has sufficient balance to pay transaction fees
-- **Simulate transaction**: Use `FullClient.sendSimulationTransaction()` to pre-execute transaction
-- **Check errors**: Examine console error messages and transaction status
-
-### 2. How to optimize Gas costs?
-- **Batch operations**: Use batch functions like `collectRewardAndFeePayload()`
-- **Set reasonable Gas budget**: Set appropriate Gas budget based on operation complexity
-- **Choose off-peak hours**: Execute transactions during non-congested network times
-- **Use testnet**: Validate operations on testnet first
-
-### 3. How to set price slippage protection?
-- **Set `max_price_slippage` parameter**: Typically set to 0.01 (1%)
-- **Real-time price check**: Check current price before execution
-- **Use `validateActiveIdSlippage()`**: Validate active Bin ID slippage
-
-### 4. How to choose strategy types?
-- **Spot strategy**: Suitable for around current price, liquidity concentration
-- **BidAsk strategy**: Suitable for market making, larger bid-ask spread
-- **Curve strategy**: Suitable for automatic adjustment, wider price range
-
-## Next Steps
-
-### Further Learning
-- View [Complete Example Code](examples/full-examples.md) for end-to-end usage scenarios
-- Learn [Advanced Strategies](examples/liquidity-management.md#advanced-strategies) to optimize liquidity provision
-- Explore [API Reference](api-reference/tool-functions.md) for detailed function descriptions
-
-### Practical Projects
-1. Create a small liquidity position on testnet
-2. Execute a token swap operation
-3. Try collecting position fees and rewards
-4. Create a custom DLMM pool configuration
-
-### Resource Links
-- [Cetus Protocol Official Documentation](https://cetus-1.gitbook.io/cetus-developer-docs)
-- [GitHub Repository](https://github.com/CetusProtocol)
+## Resources
+- [Cetus Protocol Documentation](https://cetus-1.gitbook.io/cetus-developer-docs)
+- [GitHub Repository](https://github.com/CetusProtocol/cetus-sdk-v2)
+- [@cetusprotocol/dlmm-sdk on npm](https://www.npmjs.com/package/@cetusprotocol/dlmm-sdk)
 
 ---
 
-**Note**: This guide is based on Cetus DLMM SDK v1.0.3. SDK updates may cause API changes; please refer to the latest official documentation.
+**Note**: This guide is based on Cetus DLMM SDK v2. SDK updates may cause API changes; please refer to the latest official documentation.
